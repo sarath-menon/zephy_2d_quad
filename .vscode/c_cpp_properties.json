@@ -1,0 +1,13 @@
+{
+  "configurations": [
+    {
+      "name": "STM32",
+      "includePath": [
+        "Src/simulator"
+      ],
+      "defines": [],
+      "compilerPath": "/usr/local/bin/arm-none-eabi-gcc"
+    }
+  ],
+  "version": 4
+}
