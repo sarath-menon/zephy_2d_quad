@@ -9,6 +9,10 @@ int main() {
   // Initialize SPI bus
   const struct device *spi = device_get_binding("SPI_1");
 
+  // Freqeuncy of altotude control loop in Hz
+  constexpr static int altitude_rate = 200;
+  constexpr static int altitude_dt = 1 / altitude_rate;
+
   // Set 8 Mhz frequency and 3Mhz transfer
   struct spi_config spi_cfg {
     .frequency = 3000000,
@@ -30,7 +34,7 @@ int main() {
 
   // Euler integration timestep
   constexpr static float dt = 0.01;
-  constexpr static float euler_steps = 400;
+  constexpr static int euler_steps = 100;
 
   // feedforward thrust = - g
   float ff_thrust = 9.81;
@@ -38,23 +42,34 @@ int main() {
   double tx_data = 4;
   double rx_data = 0;
 
-  for (int i = 0; i < euler_steps; i++) {
+  int counter = 0;
 
-    // // Get system state
-    quad.sensor_read();
+  for (;;) {
 
-    // // Send system state
-    tx_data = quad.z_mes();
-    spi_master_transceive(spi, &spi_cfg, &tx_data, &rx_data);
-    printf("Sent: %f\n", tx_data);
+    if (counter < euler_steps) {
 
-    // Compute control input
-    float altitude_error = altitude_target - quad.z_mes();
+      // Get system state
+      quad.sensor_read();
 
-    // Apply control input and compute the change
-    quad.dynamics(thrust_command, 0);
-    // quad.euler_step(dt);
+      // Send system state
+      tx_data = quad.z_mes();
+      spi_master_transceive(spi, &spi_cfg, &tx_data, &rx_data);
+      printf("Sent: %f\n", tx_data);
 
-    k_sleep(K_TIMEOUT_ABS_MS(1));
+      // Compute control input
+      float altitude_error = altitude_target - quad.z_mes();
+
+      // Apply control input and compute the change
+      quad.dynamics(thrust_command, 0.0);
+      quad.euler_step(dt);
+
+      k_sleep(K_TIMEOUT_ABS_MS(altitude_dt));
+
+      // Increment counter variable
+      counter++;
+    }
+
+    else
+      k_cpu_idle();
   }
 }
