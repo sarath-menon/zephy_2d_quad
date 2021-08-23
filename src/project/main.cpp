@@ -18,28 +18,12 @@ int main() {
     .frequency = 3000000, .operation = SPI_WORD_SET(16) | SPI_OP_MODE_SLAVE
   };
 
-  float altitude_target = 5;
-  float thrust_command = 0.0;
-
-  // Altitude PID Gains
-  float k_p__z = 6.5;
-  float k_i__z = 0;
-  float k_d__z = 2;
-
-  // Translation PID Gains
-  float k_p__x = 6.5;
-  float k_i__x = 0;
-  float k_d__x = 2;
-
   // Euler integration timestep
   constexpr static float dt = 0.01;
-  constexpr static int euler_steps = 100;
+  constexpr static int euler_steps = 500;
 
-  // feedforward thrust = - g
-  float ff_thrust = 9.81;
-
-  double tx_data = 4;
-  double rx_data = 0;
+  double z_measured = 4;
+  double thrust_command = 0;
 
   int counter = 0;
 
@@ -51,14 +35,11 @@ int main() {
       quad.sensor_read();
 
       // Send system state
-      tx_data = quad.z_mes();
+      z_measured = quad.z_mes();
 
-      // printf("Sent: %f\n", tx_data);
-      spi_master_transceive(spi, &spi_cfg, &tx_data, &rx_data);
-      printf("%f\n", tx_data);
-
-      // Compute control input
-      float altitude_error = altitude_target - quad.z_mes();
+      // printf("Sent: %f\n", z_measured);
+      spi_master_transceive(spi, &spi_cfg, &z_measured, &thrust_command);
+      printf("%f\n", z_measured);
 
       // Apply control input and compute the change
       quad.dynamics(thrust_command, 0.0);
