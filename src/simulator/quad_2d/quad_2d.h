@@ -72,19 +72,11 @@ public:
     // x_dot = x_dot_mes(); [Note: thrust is mass normalized]
     x_ddot = actual_thrust * sin(beta) - drag_coeff * x_dot;
 
-    // z_dot = z_dot_mes();
-    if (z < 0) {
-      // To prevent freefall into the ground
-      z = 0;
-      z_dot = 0;
-      z_ddot = 0;
-    } else
-      z_ddot = actual_thrust * cos(beta) - g - drag_coeff * fabs(z_dot);
+    z_ddot = actual_thrust * cos(beta) - g - drag_coeff * fabs(z_dot);
   }
 
   // Numerical integration
   void euler_step(float dt) {
-    // Declare dt for now
 
     // Translation
     x = x + x_dot * dt;
@@ -96,6 +88,13 @@ public:
     // Rotation
     beta = beta + beta_dot * dt;
     beta_dot = beta_dot + beta_ddot * dt;
+
+    if (z < 0) {
+      // To prevent freefall into the ground
+      z = 0;
+      z_dot = 0;
+      z_ddot = 0;
+    }
   }
 
   // Get sensor measurements by adding artifical noise to the sensors

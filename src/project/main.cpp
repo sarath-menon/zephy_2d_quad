@@ -54,7 +54,8 @@ int main() {
       // Send system state
       tx_data = quad.z_mes();
       spi_master_transceive(spi, &spi_cfg, &tx_data, &rx_data);
-      printf("Sent: %f\n", tx_data);
+      // printf("Sent: %f\n", tx_data);
+      printf("%f\n", tx_data);
 
       // Compute control input
       float altitude_error = altitude_target - quad.z_mes();
@@ -63,6 +64,7 @@ int main() {
       quad.dynamics(thrust_command, 0.0);
       quad.euler_step(dt);
 
+      // Sleep between cycles
       k_sleep(K_TIMEOUT_ABS_MS(altitude_dt));
 
       // Increment counter variable
