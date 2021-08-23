@@ -15,8 +15,7 @@ int main() {
 
   // Set 8 Mhz frequency and 3Mhz transfer
   struct spi_config spi_cfg {
-    .frequency = 3000000,
-    .operation = SPI_WORD_SET(16) | SPI_TRANSFER_MSB | SPI_OP_MODE_MASTER
+    .frequency = 3000000, .operation = SPI_WORD_SET(16) | SPI_OP_MODE_SLAVE
   };
 
   float altitude_target = 5;
@@ -53,8 +52,9 @@ int main() {
 
       // Send system state
       tx_data = quad.z_mes();
-      spi_master_transceive(spi, &spi_cfg, &tx_data, &rx_data);
+
       // printf("Sent: %f\n", tx_data);
+      spi_master_transceive(spi, &spi_cfg, &tx_data, &rx_data);
       printf("%f\n", tx_data);
 
       // Compute control input
