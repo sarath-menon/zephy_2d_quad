@@ -22,7 +22,7 @@ int main() {
   constexpr static float dt = 0.01;
   constexpr static int euler_steps = 500;
 
-  double z_measured = 4;
+  double z_measured = 0;
   double thrust_command = 0;
 
   int counter = 0;

@@ -17,3 +17,14 @@ int spi_master_transceive(const struct device *spi, struct spi_config *spi_cfg,
 
   return spi_transceive(spi, spi_cfg, &tx, &rx);
 }
+
+int spi_master_transmit(const struct device *spi, struct spi_config *spi_cfg,
+                        double *tx_data) {
+
+  struct spi_buf tx_bufs = {.buf = tx_data, .len = 4};
+  struct spi_buf_set tx = {.buffers = &tx_bufs};
+
+  tx.count = 1;
+
+  return spi_write(spi, spi_cfg, &tx);
+}
