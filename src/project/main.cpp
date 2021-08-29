@@ -46,7 +46,7 @@ int main() {
       quad.euler_step(dt);
 
       // Sleep between cycles
-      k_sleep(K_TIMEOUT_ABS_MS(altitude_dt));
+      k_sleep(K_TIMEOUT_ABS_MS(dt));
 
       // Increment counter variable
       counter++;
